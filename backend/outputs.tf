@@ -12,3 +12,9 @@ output "website_url" {
   value       = "https://${var.domain_name}"
   description = "Your website URL (if alias created)"
 }
+
+output "cloudfront_dist_id" {
+  description = "CloudFront distribution ID"
+  value       = aws_cloudfront_distribution.cdn.id
+}
+
