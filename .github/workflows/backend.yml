@@ -37,21 +37,3 @@ jobs:
         if: github.ref == 'refs/heads/main'
         working-directory: backend
         run: terraform apply -auto-approve
-
-      - name: Capture Terraform Outputs
-        id: tfout
-        working-directory: backend
-        run: |
-          echo "api_url=$(terraform output -raw api_url)" >> $GITHUB_ENV
-          echo "cloudfront_dist_id=$(terraform output -raw cloudfront_dist_id)" >> $GITHUB_ENV
-
-      - name: Update GitHub Secrets
-        run: |
-          echo "Setting API_URL=$api_url"
-          echo "Setting CLOUDFRONT_DIST_ID=$cloudfront_dist_id"
-          gh secret set API_URL -b"$api_url"
-          gh secret set CLOUDFRONT_DIST_ID -b"$cloudfront_dist_id"
-        env:
-          api_url: ${{ env.api_url }}
-          cloudfront_dist_id: ${{ env.cloudfront_dist_id }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
