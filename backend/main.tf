@@ -1,5 +1,11 @@
 
 terraform {
+  backend "s3" {
+    bucket = "cloud-resume-terraform-state-useast1" # 👈 your bucket
+    key    = "cloud-resume/terraform.tfstate"       # 👈 path inside bucket
+    region = "us-east-1"
+    encrypt = true
+  }
   required_version = ">= 1.6.0"
   required_providers {
     aws = {
