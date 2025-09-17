@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cloud Resume Challenge</title>
+  <style>
+    body { font-family: system-ui, Arial; background:#f6f8fb; margin:40px; text-align:center; }
+    h1 { color:#1f2937; }
+    #count { font-weight:700; color:#059669; }
+    footer{ margin-top:2rem; color:#6b7280; font-size:.9rem;}
+  </style>
+</head>
+<body>
+  <h1>🚀 Cloud Resume Challenge</h1>
+  <p>Visitor Count: <span id="count">Loading...</span></p>
+  <script>
+    (async () => {
+      try {
+        const base = "{{API_BASE}}"; // replace via README or CI with TF output
+        const res  = await fetch(base + "/count");
+        const data = await res.json();
+        document.getElementById("count").textContent = data.visits ?? "N/A";
+      } catch(e) {
+        document.getElementById("count").textContent = "Error";
+        console.error(e);
+      }
+    })();
+  </script>
+  <footer>Hosted on S3 + CloudFront • API Gateway + Lambda + DynamoDB</footer>
+</body>
+</html>
