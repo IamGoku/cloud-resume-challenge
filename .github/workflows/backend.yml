@@ -31,12 +31,12 @@ jobs:
 
       - name: Terraform Init
         working-directory: backend
-        run: terraform init
+        run: terraform -chdir=backend init
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
-        working-directory: backend
-        run: terraform apply -auto-approve
+        run: terraform -chdir=backend apply -auto-approve
+      
 
       - name: Capture Terraform Outputs
         id: tfout
