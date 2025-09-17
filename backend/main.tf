@@ -261,8 +261,8 @@ resource "null_resource" "upload_frontend" {
   provisioner "local-exec" {
     command = <<EOT
 sed "s|{{API_BASE}}|${aws_apigatewayv2_api.http.api_endpoint}|g" \
-  "${path.module}/../frontend/index.template.html" > "$${path.module}/../frontend/index.html"
-aws s3 cp "${path.module}/frontend/index.html" "s3://${aws_s3_bucket.frontend.bucket}/index.html" --region ${var.region} \
+  "../frontend/index.template.html" > "../frontend/index.html"
+aws s3 cp "../frontend/index.html" "s3://${aws_s3_bucket.frontend.bucket}/index.html" --region ${var.region} \
 && aws cloudfront create-invalidation --distribution-id ${aws_cloudfront_distribution.cdn.id} --paths "/index.html"
 EOT
   }
