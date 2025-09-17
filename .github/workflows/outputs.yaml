@@ -1,0 +1,39 @@
+name: Terraform Outputs
+
+on:
+  workflow_dispatch:   # allows manual run
+
+jobs:
+  get-outputs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2   # change if needed
+
+      - name: Terraform Init
+        working-directory: backend
+        run: terraform init -input=false
+
+      - name: Terraform Output
+        working-directory: backend
+        run: |
+          echo "API_URL=$(terraform output -raw api_url)" >> $GITHUB_ENV
+          echo "CLOUDFRONT_DIST_ID=$(terraform output -raw cloudfront_dist_id)" >> $GITHUB_ENV
+          echo "WEBSITE_URL=$(terraform output -raw website_url)" >> $GITHUB_ENV
+
+      - name: Show Outputs
+        run: |
+          echo "✅ API_URL=$API_URL"
+          echo "✅ CLOUDFRONT_DIST_ID=$CLOUDFRONT_DIST_ID"
+          echo "✅ WEBSITE_URL=$WEBSITE_URL"
