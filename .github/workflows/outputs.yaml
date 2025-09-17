@@ -28,9 +28,20 @@ jobs:
       - name: Terraform Output
         working-directory: backend
         run: |
-          echo "API_URL=$(terraform output -raw api_url)" >> $GITHUB_ENV
-          echo "CLOUDFRONT_DIST_ID=$(terraform output -raw cloudfront_dist_id)" >> $GITHUB_ENV
-          echo "WEBSITE_URL=$(terraform output -raw website_url)" >> $GITHUB_ENV
+          set -e
+      
+          API_URL=$(terraform output -raw api_url || echo "MISSING")
+          CLOUDFRONT_DIST_ID=$(terraform output -raw cloudfront_dist_id || echo "MISSING")
+          WEBSITE_URL=$(terraform output -raw website_url || echo "MISSING")
+      
+          echo "API_URL=$API_URL" >> $GITHUB_ENV
+          echo "CLOUDFRONT_DIST_ID=$CLOUDFRONT_DIST_ID" >> $GITHUB_ENV
+          echo "WEBSITE_URL=$WEBSITE_URL" >> $GITHUB_ENV
+      
+          echo "✅ Captured outputs:"
+          echo "   API_URL=$API_URL"
+          echo "   CLOUDFRONT_DIST_ID=$CLOUDFRONT_DIST_ID"
+          echo "   WEBSITE_URL=$WEBSITE_URL"
 
       - name: Show Outputs
         run: |
