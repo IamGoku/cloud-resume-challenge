@@ -253,7 +253,7 @@ resource "aws_route53_record" "alias" {
 resource "null_resource" "upload_frontend" {
   # Re-run when either the file or bucket changes
   triggers = {
-    file_hash  = filemd5("${path.module}/../frontend/index.template.html"")
+    file_hash  = filemd5("${path.module}/../frontend/index.template.html")
     bucket     = aws_s3_bucket.frontend.bucket
     dist_id    = aws_cloudfront_distribution.cdn.id
   }
@@ -261,7 +261,7 @@ resource "null_resource" "upload_frontend" {
   provisioner "local-exec" {
     command = <<EOT
 sed "s|{{API_BASE}}|${aws_apigatewayv2_api.http.api_endpoint}|g" \
-  "${path.module}/../frontend/index.template.html"" > "$${path.module}/../frontend/index.html""
+  "${path.module}/../frontend/index.template.html" > "$${path.module}/../frontend/index.html"
 aws s3 cp "${path.module}/frontend/index.html" "s3://${aws_s3_bucket.frontend.bucket}/index.html" --region ${var.region} \
 && aws cloudfront create-invalidation --distribution-id ${aws_cloudfront_distribution.cdn.id} --paths "/index.html"
 EOT
