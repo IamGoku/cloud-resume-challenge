@@ -1,22 +1,51 @@
-# Backend Terraform workflow
 name: Backend Deploy
+
 on:
   push:
     paths:
       - 'backend/**'
-    branches: [ main ]
+    branches:
+      - main
+
 jobs:
   terraform:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-      - uses: hashicorp/setup-terraform@v2
-      - uses: aws-actions/configure-aws-credentials@v2
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
-      - run: terraform init
+
+      - name: Terraform Init
         working-directory: backend
-      - run: terraform apply -auto-approve
+        run: terraform init
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
         working-directory: backend
+        run: terraform apply -auto-approve
+
+      - name: Capture Terraform Outputs
+        id: tfout
+        working-directory: backend
+        run: |
+          echo "api_url=$(terraform output -raw api_url)" >> $GITHUB_ENV
+          echo "cloudfront_dist_id=$(terraform output -raw cloudfront_dist_id)" >> $GITHUB_ENV
+
+      - name: Update GitHub Secrets
+        run: |
+          gh secret set API_URL -b"$api_url"
+          gh secret set CLOUDFRONT_DIST_ID -b"$cloudfront_dist_id"
+        env:
+          api_url: ${{ env.api_url }}
+          cloudfront_dist_id: ${{ env.cloudfront_dist_id }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
